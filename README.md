@@ -5,7 +5,7 @@ A local fruit-store assistant built with **LangChain**, **LangGraph**, and **Oll
 The assistant answers questions about fruit prices and stock, prepares invoice quotes, and updates inventory only after an explicit order confirmation.
 
 Inventory validation, invoice calculations, and stock updates are handled by Python code—not by the language model.
-
+ 
 ## Features
 
 - Run a local language model through Ollama.
