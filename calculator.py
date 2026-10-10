@@ -1,37 +1,30 @@
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_UP  # Use decimals and half-up rounding.
 
 
-def calculate(validated_items, currency):
-    """
-    Calculate invoice lines using trusted inventory prices.
+def calculate(validated_items, currency):  # Calculate the invoice.
+    cent = Decimal("0.01")  # Set two-decimal precision.
+    total = Decimal("0")  # Start the total at zero.
+    lines = []  # Store invoice items.
 
-    Stock validation is handled before this function is called.
-    """
-    cent = Decimal("0.01")
-    total = Decimal("0")
-    lines = []
+    for item in validated_items:  # Process each validated item.
+        product = item["product"]  # Get the product record.
+        quantity = item["quantity"]  # Get the requested quantity.
+        price = Decimal(str(product["price_per_kg"]))  # Convert price to Decimal.
 
-    for item in validated_items:
-        product = item["product"]
-        quantity = item["quantity"]
-        price = Decimal(str(product["price_per_kg"]))
+        subtotal = price * quantity  # Calculate the item's cost.
+        subtotal = subtotal.quantize(cent, rounding=ROUND_HALF_UP)  # Round to two decimals.
 
-        subtotal = (price * quantity).quantize(
-            cent,
-            rounding=ROUND_HALF_UP,
-        )
+        total = total + subtotal  # Add the subtotal to the total.
 
-        total += subtotal
+        lines.append({  # Add an invoice item.
+            "product_name": product["name"],  # Store the product name.
+            "quantity_kg": str(quantity),  # Store quantity as text.
+            "price_per_kg": str(price),  # Store price as text.
+            "subtotal": str(subtotal),  # Store subtotal as text.
+        })  # Finish adding the item.
 
-        lines.append({
-            "product_name": product["name"],
-            "quantity_kg": str(quantity),
-            "price_per_kg": str(price),
-            "subtotal": str(subtotal),
-        })
-
-    return {
-        "currency": currency,
-        "items": lines,
-        "total": str(total.quantize(cent)),
-    }
+    return {  # Return the complete invoice.
+        "currency": currency,  # Store the currency.
+        "items": lines,  # Store all invoice items.
+        "total": str(total.quantize(cent)),  # Store the rounded total as text.
+    }  # Finish the invoice.
